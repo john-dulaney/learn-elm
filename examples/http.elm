@@ -60,41 +60,59 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Html Msg
-view model =
-    div []
-        [ h2 [] [ text model.topic ]
-        , button [ onClick MorePlease ] [ text "More Please!" ]
-        , br [] []
-        , img [ src model.gifUrl ] []
-        ]
+-- view : Model -> Html Msg
+-- view model =
+--     div []
+--         [ h2 [] [ text model.topic ]
+--         , button [ onClick MorePlease ] [ text "More Please!" ]
+--         , br [] []
+--         , img [ src model.gifUrl ] []
+--         ]
+
+
+type Msg
+    = MorePlease
+    | NewGif (Result Http.Error String)
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        MorePlease ->
+            ( model, getRandomGif model.topic )
+
+        NewGif (Ok newUrl) ->
+            ( Model model.topic newUrl, Cmd.none )
+
+        NewGif (Err _) ->
+            ( model, Cmd.none )
 
 
 
--- SUBSCRIPTIONS
+-- -- SUBSCRIPTIONS
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
+-- subscriptions : Model -> Sub Msg
+-- subscriptions model =
+--     Sub.none
 
 
 
--- HTTP
+-- -- HTTP
 
 
-getRandomGif : String -> Cmd Msg
-getRandomGif topic =
-    let
-        url =
-            "https://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" ++ topic
+-- getRandomGif : String -> Cmd Msg
+-- getRandomGif topic =
+--     let
+--         url =
+--             "https://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" ++ topic
 
-        request =
-            Http.get url decodeGifUrl
-    in
-        Http.send NewGif request
+--         request =
+--             Http.get url decodeGifUrl
+--     in
+--         Http.send NewGif request
 
 
-decodeGifUrl : Decode.Decoder String
-decodeGifUrl =
-    Decode.at [ "data", "image_url" ] Decode.string
+-- decodeGifUrl : Decode.Decoder String
+-- decodeGifUrl =
+--     Decode.at [ "data", "image_url" ] Decode.string
